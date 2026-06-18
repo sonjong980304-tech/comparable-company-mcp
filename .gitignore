@@ -1,0 +1,23 @@
+# 환경변수 (API 키 포함 — 절대 커밋 금지)
+.env
+
+# 캐시 파일 (대용량 바이너리)
+cache/
+*.parquet
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
