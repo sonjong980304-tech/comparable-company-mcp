@@ -1,13 +1,11 @@
-"""일일 캐싱 관리: corpCode.xml + KIND 상장사 목록"""
+"""일일 캐싱 관리: corpCode.xml"""
 from __future__ import annotations
 
 import asyncio
 import io
 import logging
-import os
 import zipfile
 import xml.etree.ElementTree as ET
-from datetime import date
 from pathlib import Path
 from typing import Optional
 
@@ -19,15 +17,6 @@ logger = logging.getLogger(__name__)
 CACHE_DIR = Path(__file__).parent / "cache"
 CORP_CODE_CACHE = CACHE_DIR / "corp_codes.parquet"
 CORP_CODE_XML = CACHE_DIR / "CORPCODE.xml"
-KIND_CACHE_PREFIX = "kind_listed_"
-
-
-def _today_str() -> str:
-    return date.today().strftime("%Y%m%d")
-
-
-def _kind_cache_path() -> Path:
-    return CACHE_DIR / f"{KIND_CACHE_PREFIX}{_today_str()}.parquet"
 
 
 def ensure_cache_dir() -> None:
@@ -106,30 +95,3 @@ def lookup_corp_code_by_stock(stock_code: str, df: pd.DataFrame) -> Optional[str
     if not row.empty:
         return row.iloc[0]["corp_code"]
     return None
-
-
-# ─── KIND 상장사 목록 ─────────────────────────────────────────────────────────
-
-def kind_cache_exists() -> bool:
-    return _kind_cache_path().exists()
-
-
-def load_kind_cache() -> pd.DataFrame:
-    return pd.read_parquet(_kind_cache_path())
-
-
-def save_kind_cache(df: pd.DataFrame) -> None:
-    ensure_cache_dir()
-    df.to_parquet(_kind_cache_path(), index=False)
-    logger.info("KIND 상장사 캐시 저장: %d건 → %s", len(df), _kind_cache_path())
-
-
-def purge_old_kind_caches(keep_days: int = 3) -> None:
-    """오래된 KIND 캐시 파일 정리."""
-    for path in CACHE_DIR.glob(f"{KIND_CACHE_PREFIX}*.parquet"):
-        date_str = path.stem.replace(KIND_CACHE_PREFIX, "")
-        if date_str < _today_str():
-            try:
-                path.unlink()
-            except OSError:
-                pass
