@@ -12,10 +12,13 @@ from __future__ import annotations
 
 import logging
 import os
+from pathlib import Path
 
 from dotenv import load_dotenv
 
-load_dotenv()
+# .env 는 스크립트 옆 경로로 절대 지정한다 — Claude Code/Desktop 이 MCP 서버를
+# 어떤 cwd 에서 띄우든(등록한 프로젝트 밖에서도) 항상 키를 찾도록 하기 위함.
+load_dotenv(Path(__file__).resolve().parent / ".env")
 
 DART_API_KEY: str = os.environ.get("DART_API_KEY", "")
 
